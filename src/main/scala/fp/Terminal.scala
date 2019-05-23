@@ -97,4 +97,41 @@ object Terminal {
       in <- t.read
       _ <- t.write(in)
     } yield in
+
+  /**
+    * Result of running [[fp.Terminal.echo]] once.
+    * It's not pure as we start reading. So some
+    * contexts are not safe.
+    */
+  val futureEcho: Future[String] = echo[Future]
+
+  /**
+    * Safe execution context, which lazily evaluates
+    * a thunk. It's just a data structure that
+    * references code, but isn't actually running
+    * anything.
+    */
+  final class IO[A](val interpret: () => A) {
+    def map[B](f: A => B): IO[B] = IO(f(interpret()))
+    def flatMap[B](f: A => IO[B]): IO[B] = IO(f(interpret()).interpret())
+  }
+  object IO {
+    def apply[A](a: => A): IO[A] = new IO(() => a)
+  }
+
+  object TerminalIO extends Terminal[IO] {
+    def read: IO[String] = IO { io.StdIn.readLine }
+    def write(t: String): IO[Unit] = IO { println(t) }
+  }
+
+  /**
+    * Pure value that just describes execution without
+    * interpreting it.
+    *
+    * We only do something if we call
+    * {{
+    * delayed.interpret()
+    * }}.
+    */
+  val delayed: IO[String] = echo[IO]
 }
