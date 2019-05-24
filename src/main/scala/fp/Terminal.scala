@@ -99,12 +99,14 @@ object Terminal {
     } yield in
 
   /**
+    * {{
+    * val futureEcho: Future[String] = echo[Future]
+    * }}
+    *
     * Result of running [[fp.Terminal.echo]] once.
     * It's not pure as we start reading. So some
     * contexts are not safe.
     */
-  val futureEcho: Future[String] = echo[Future]
-
   /**
     * Safe execution context, which lazily evaluates
     * a thunk. It's just a data structure that
@@ -125,13 +127,16 @@ object Terminal {
   }
 
   /**
-    * Pure value that just describes execution without
-    * interpreting it.
-    *
-    * We only do something if we call
-    * {{
-    * delayed.interpret()
-    * }}.
-    */
-  val delayed: IO[String] = echo[IO]
+  * {{
+  * val delayed: IO[String] = echo[IO]
+  * }}
+  *
+  * Pure value that just describes execution without
+  * interpreting it.
+  *
+  * We only do something if we call
+  * {{
+  * delayed.interpret()
+  * }}.
+  */
 }
