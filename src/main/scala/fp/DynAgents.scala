@@ -26,13 +26,9 @@ final class DynAgentsModule[F[_]: Monad](D: Drone[F], M: Machines[F])
     * results. The pending is empty at this point.
     */
   override def initial: F[WorldView] =
-    for {
-      db <- D.getBacklog
-      da <- D.getAgents
-      mm <- M.getManaged
-      ma <- M.getAlive
-      mt <- M.getTime
-    } yield WorldView(db, da, mm, ma, Map.empty, mt)
+    ^^^^(D.getBacklog, D.getAgents, M.getManaged, M.getAlive, M.getTime) {
+      case (db, da, mm, ma, mt) => WorldView(db, da, mm, ma, Map.empty, mt)
+    }
 
   /**
     * Should call initial to refresh our world view,
@@ -59,12 +55,11 @@ final class DynAgentsModule[F[_]: Monad](D: Drone[F], M: Machines[F])
       } yield update
 
     case Stale(nodes) =>
-      nodes.foldLeftM(world) { (world, n) =>
-        for {
-          _ <- M.stop(n)
-          update = world.copy(pending = world.pending + (n -> world.time))
-        } yield update
-      }
+      for {
+        stopped <- nodes.traverse(M.stop)
+        updates = stopped.map(_ -> world.time).toList.toMap
+        update = world.copy(pending = world.pending ++ updates)
+      } yield update
 
     case _ => world.pure[F]
   }
