@@ -4,14 +4,27 @@ import scalaz.Scalaz._
 import scala.concurrent.duration.DurationInt
 import scalaz.NonEmptyList
 
+/**
+  * The main business logic.
+  */
 trait DynAgents[F[_]] {
   def initial: F[WorldView]
   def update(old: WorldView): F[WorldView]
   def act(world: WorldView): F[WorldView]
 }
 
+/**
+  * Module implementation of business logic. The module
+  * depends only on other modules, algebras and pure
+  * functions, and can be abstracted over F.
+  */
 final class DynAgentsModule[F[_]: Monad](D: Drone[F], M: Machines[F])
     extends DynAgents[F] {
+
+  /**
+    * Call all external services and aggregate their
+    * results. The pending is empty at this point.
+    */
   override def initial: F[WorldView] =
     for {
       db <- D.getBacklog
@@ -21,6 +34,10 @@ final class DynAgentsModule[F[_]: Monad](D: Drone[F], M: Machines[F])
       mt <- M.getTime
     } yield WorldView(db, da, mm, ma, Map.empty, mt)
 
+  /**
+    * Should call initial to refresh our world view,
+    * preserving known pending actions.
+    */
   override def update(old: WorldView) =
     for {
       snap <- initial
@@ -53,6 +70,11 @@ final class DynAgentsModule[F[_]: Monad](D: Drone[F], M: Machines[F])
   }
 
   private object NeedsAgent {
+
+    /**
+      * Returns candidate node to start. Start new node only if
+      * there is no agents and pending machines available.
+      */
     def unapply(world: WorldView): Option[MachineNode] = world match {
       case WorldView(backlog, 0, managed, alive, pending, _)
           if backlog > 0 && alive.isEmpty && pending.isEmpty =>

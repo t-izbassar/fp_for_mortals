@@ -1,6 +1,10 @@
 package fp
 import scalaz.NonEmptyList
 
+/**
+  * CI Server, which receives jobs and
+  * manages worker agents.
+  */
 trait Drone[F[_]] {
   def getBacklog: F[Int]
   def getAgents: F[Int]

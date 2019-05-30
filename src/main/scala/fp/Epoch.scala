@@ -5,6 +5,9 @@ import java.time.Instant
 import contextual.Verifier
 import contextual.Prefix
 
+/**
+  * Millisecond timestamp.
+  */
 final case class Epoch(millis: Long) extends AnyVal {
   def +(d: FiniteDuration): Epoch = Epoch(millis + d.toMillis)
   def -(e: Epoch): FiniteDuration =
