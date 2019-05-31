@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "com.propensive" %% "contextual" % "1.1.0",
   "eu.timepit" %% "refined" % "0.9.2",
   "eu.timepit" %% "refined-scalaz" % "0.9.2",
+  "io.argonaut" %% "argonaut" % "6.2.3",
   "org.scalactic" %% "scalactic" % "3.0.5",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )
