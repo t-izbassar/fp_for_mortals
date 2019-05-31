@@ -7,35 +7,35 @@ object Data {
   type C = Int
 
   /**
-  * Product type is a sum of other types.
-  *
-  * The complexity of a product is a multiplication
-  * of each part.
-  */
+    * Product type is a sum of other types.
+    *
+    * The complexity of a product is a multiplication
+    * of each part.
+    */
   final case class ABC(a: A.type, b: B, c: C)
 
   /**
-  * Coproduct is one of the provided types.
-  *
-  * The complexity of a coproduct is a sum
-  * of each part.
-  *
-  * Prefer coproduct over product as it
-  * has less complexity.
-  */
+    * Coproduct is one of the provided types.
+    *
+    * The complexity of a coproduct is a sum
+    * of each part.
+    *
+    * Prefer coproduct over product as it
+    * has less complexity.
+    */
   sealed abstract class XYZ
   case object X extends XYZ
   case object Y extends XYZ
   final case class Z(b: B) extends XYZ
 
   /**
-  * ADTs can contain pure functions. They don't translate
-  * perfectly onto the JVM.
-  *
-  * The complexity of a total function is the number of
-  * possible functions that can satisfy the type signature.
-  * It can be calculated by `output^input`.
-  */
+    * ADTs can contain pure functions. They don't translate
+    * perfectly onto the JVM.
+    *
+    * The complexity of a total function is the number of
+    * possible functions that can satisfy the type signature.
+    * It can be calculated by `output^input`.
+    */
   final case class UserConfiguration(accepts: Int => Boolean)
 
   // Nesting types
@@ -47,29 +47,29 @@ object Data {
   type Accepted = String |: Long |: Boolean
 
   /**
-  * Person with input validation. However, this breaks totality.
-  */
+    * Person with input validation. However, this breaks totality.
+    */
   final case class PersonWithRequired(name: String, age: Int) {
-  	require(name.nonEmpty && age > 0)
+    require(name.nonEmpty && age > 0)
   }
 
   /**
-  * Protect invalid instances from propagating by hiding
-  * constructor and providing apply, which returns Either.
-  */
-  final case class Person private(name: String, age: Int)
+    * Protect invalid instances from propagating by hiding
+    * constructor and providing apply, which returns Either.
+    */
+  final case class Person private (name: String, age: Int)
   object Person {
-  	def apply(name: String, age: Int): Either[String, Person] = {
-  	  if (name.nonEmpty && age > 0) Right(new Person(name, age))
-  	  else Left(s"bad input: $name, $age")
-  	}
+    def apply(name: String, age: Int): Either[String, Person] = {
+      if (name.nonEmpty && age > 0) Right(new Person(name, age))
+      else Left(s"bad input: $name, $age")
+    }
   }
 
   def welcome(person: Person): String =
-  	s"${person.name} at ${person.age}"
+    s"${person.name} at ${person.age}"
 
   val welcomedPerson = for {
-  	person <- Person("", -1)
+    person <- Person("", -1)
   } yield welcome(person)
 
   import eu.timepit.refined._
@@ -79,11 +79,11 @@ object Data {
   import eu.timepit.refined.auto._
 
   /**
-  * Using types with restrictions.
-  */
+    * Using types with restrictions.
+    */
   final case class PersonWithRefined(
-  	name: String Refined NonEmpty,
-  	age: Int Refined Positive
+    name: String Refined NonEmpty,
+    age: Int Refined Positive
   )
 
   val sam: String Refined NonEmpty = "Sam"
@@ -98,9 +98,8 @@ object Data {
   type Name = NonEmpty And MaxSize[W.`10`.T]
 
   final case class PersonWithRefinedName(
-  	name: String Refined Name,
-  	age: Int Refined Positive
+    name: String Refined Name,
+    age: Int Refined Positive
   )
-
 
 }
