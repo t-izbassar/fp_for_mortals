@@ -1,4 +1,4 @@
-package fp
+package example.fp
 
 object Data {
   // values
