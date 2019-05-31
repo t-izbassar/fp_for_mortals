@@ -1,3 +1,5 @@
+package fp.example
+
 import scalaz._, Scalaz._
 import simulacrum._
 
